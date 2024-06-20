@@ -21,7 +21,7 @@ module.exports = {
 		migrations: {
 			tableName: 'knex_migrations',
 		},
-		...knexSnakeCaseMappers,
+		...knexSnakeCaseMappers(),
 	},
 
 	production: {
@@ -38,6 +38,6 @@ module.exports = {
 		migrations: {
 			tableName: 'knex_migrations',
 		},
-		...knexSnakeCaseMappers,
+		...knexSnakeCaseMappers(),
 	},
 };
