@@ -43,8 +43,6 @@ const login = asyncHandler(async (req, res) => {
 
 	const user = await User.query().findOne({ email });
 
-	console.log(user, password);
-
 	if (user && (await user.validatePassword(password))) {
 		generateToken(res, user);
 

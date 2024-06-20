@@ -1,7 +1,7 @@
 module.exports = ({ message, data }) => {
 	return {
 		message: message || 'OK',
-		data: data,
+		data: data || null,
 		success: true,
 	};
 };
