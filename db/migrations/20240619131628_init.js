@@ -17,6 +17,20 @@ exports.up = function (knex) {
 			table.string('image_url');
 			table.uuid('user_id').references('id').inTable('user');
 			table.timestamps(true, true);
+		})
+		.createTable('follow', (table) => {
+			table
+				.uuid('following_id')
+				.references('id')
+				.inTable('user')
+				.onDelete('CASCADE');
+			table
+				.uuid('follower_id')
+				.references('id')
+				.inTable('user')
+				.onDelete('CASCADE');
+			table.primary(['following_id', 'follower_id']);
+			table.timestamps(true, true);
 		});
 };
 
@@ -25,5 +39,8 @@ exports.up = function (knex) {
  * @returns { Promise<void> }
  */
 exports.down = function (knex) {
-	return knex.schema.dropTableIfExists('post').dropTableIfExists('user');
+	return knex.schema
+		.dropTableIfExists('post')
+		.dropTableIfExists('user')
+		.dropTableIfExists('follow');
 };

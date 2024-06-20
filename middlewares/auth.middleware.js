@@ -11,7 +11,7 @@ const protectRoute = asyncHandler(async (req, res, next) => {
 
 			const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-			const user = await User.query().findById(decoded.id).select('-password');
+			const user = await User.query().findById(decoded.id);
 
 			if (!user) {
 				res.status(401);
