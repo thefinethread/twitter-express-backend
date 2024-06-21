@@ -48,7 +48,7 @@ const followUser = asyncHandler(async (req, res) => {
 	// create a new relation
 	await Follow.query().insert(followObj);
 
-	res.status(200).json(response());
+	res.status(200).json(response({}));
 });
 
 const unFollowUser = asyncHandler(async (req, res) => {

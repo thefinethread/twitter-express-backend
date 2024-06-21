@@ -13,7 +13,7 @@ exports.up = function (knex) {
 		})
 		.createTable('post', (table) => {
 			table.uuid('id', { primaryKey: true }).defaultTo(knex.fn.uuid());
-			table.string('text').notNullable();
+			table.text('content').notNullable();
 			table.string('image_url');
 			table.uuid('user_id').references('id').inTable('user');
 			table.timestamps(true, true);
@@ -41,6 +41,6 @@ exports.up = function (knex) {
 exports.down = function (knex) {
 	return knex.schema
 		.dropTableIfExists('post')
-		.dropTableIfExists('user')
-		.dropTableIfExists('follow');
+		.dropTableIfExists('follow')
+		.dropTableIfExists('user');
 };
