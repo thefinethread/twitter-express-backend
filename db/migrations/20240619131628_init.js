@@ -7,6 +7,7 @@ exports.up = function (knex) {
 		.createTable('user', (table) => {
 			table.uuid('id', { primaryKey: true }).defaultTo(knex.fn.uuid());
 			table.string('name').notNullable();
+			table.string('username').notNullable().unique();
 			table.string('email').notNullable().unique();
 			table.string('password').notNullable();
 			table.timestamps(true, true);

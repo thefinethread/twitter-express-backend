@@ -80,4 +80,20 @@ const unFollowUser = asyncHandler(async (req, res) => {
 	res.status(200).json(response({}));
 });
 
-module.exports = { updateUser, followUser, unFollowUser };
+const searchUsers = asyncHandler(async (req, res) => {
+	const { searchTerm } = req.query;
+
+	if (!searchTerm) {
+		res.status(400);
+		throw new Error('Search term is required');
+	}
+
+	const users = await User.query()
+		.where('name', 'ilike', `%${searchTerm}%`)
+		.orWhere('username', 'ilike', `%${searchTerm}%`)
+		.select(['id', 'name', 'username']);
+
+	res.status(200).json({ data: users });
+});
+
+module.exports = { updateUser, followUser, unFollowUser, searchUsers };
