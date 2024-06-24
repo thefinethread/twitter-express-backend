@@ -60,9 +60,13 @@ const login = asyncHandler(async (req, res) => {
 	}
 });
 
+const getMe = asyncHandler(async (req, res) => {
+	res.status(200).json(response({ data: req.user }));
+});
+
 const logout = (req, res) => {
 	res.clearCookie('token');
 	res.status(201).json(response({ message: 'You are logged out' }));
 };
 
-module.exports = { signUp, login, logout };
+module.exports = { signUp, login, getMe, logout };
