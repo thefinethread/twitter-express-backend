@@ -35,7 +35,8 @@ const getPostsOfFollowingUsers = asyncHandler(async (req, res) => {
 			'post.createdAt',
 			Follow.raw(`json_build_object(
         'id', "user".id,
-        'name', "user".name
+        'name', "user".name,
+				'username', "user".username
       ) as user`)
 		)
 		.orderBy('created_at', 'desc');

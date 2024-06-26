@@ -82,6 +82,7 @@ const unFollowUser = asyncHandler(async (req, res) => {
 
 const searchUsers = asyncHandler(async (req, res) => {
 	const { searchTerm } = req.query;
+	const currentUserId = req.user.id;
 
 	if (!searchTerm) {
 		res.status(400);
@@ -89,11 +90,24 @@ const searchUsers = asyncHandler(async (req, res) => {
 	}
 
 	const users = await User.query()
-		.where('name', 'ilike', `%${searchTerm}%`)
-		.orWhere('username', 'ilike', `%${searchTerm}%`)
-		.select(['id', 'name', 'username']);
+		.where((builder) => {
+			builder
+				.where('name', 'ilike', `%${searchTerm}%`)
+				.orWhere('username', 'ilike', `%${searchTerm}%`);
+		})
+		.andWhere('id', '!=', currentUserId)
 
-	res.status(200).json({ data: users });
+		.leftJoin('follow', 'user.id', 'follow.following_id')
+		.select([
+			'user.id',
+			'user.name',
+			'user.username',
+			User.raw(
+				'CASE WHEN "follow"."follower_id" IS NOT NULL THEN true ELSE false END AS "isFollowing"'
+			),
+		]);
+
+	res.status(200).json(response({ data: users }));
 });
 
 module.exports = { updateUser, followUser, unFollowUser, searchUsers };
