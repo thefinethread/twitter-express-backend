@@ -6,6 +6,40 @@ class User extends Model {
 		return 'user';
 	}
 
+	static get relationMappings() {
+		const Post = require('./Post.model');
+		const Follow = require('./Follow.model');
+
+		return {
+			posts: {
+				relation: Model.HasManyRelation,
+				modelClass: Post,
+				join: {
+					from: 'user.id',
+					to: 'post.user_id',
+				},
+			},
+
+			followers: {
+				relation: Model.HasManyRelation,
+				modelClass: Follow,
+				join: {
+					from: 'user.id',
+					to: 'follow.following_id',
+				},
+			},
+
+			following: {
+				relation: Model.HasManyRelation,
+				modelClass: Follow,
+				join: {
+					from: 'user.id',
+					to: 'follow.follower_id',
+				},
+			},
+		};
+	}
+
 	// JSON schema for validation
 	static get jsonSchema() {
 		return {

@@ -110,4 +110,28 @@ const searchUsers = asyncHandler(async (req, res) => {
 	res.status(200).json(response({ data: users }));
 });
 
-module.exports = { updateUser, followUser, unFollowUser, searchUsers };
+const getUserProfile = asyncHandler(async (req, res) => {
+	const userId = req.user.id;
+
+	const data = await User.query()
+		.findById(userId)
+		.select(
+			'user.id',
+			'user.name',
+			'user.username',
+			'user.created_at',
+			User.relatedQuery('posts').count().as('postsCount'),
+			User.relatedQuery('following').count().as('followingCount'),
+			User.relatedQuery('followers').count().as('followersCount')
+		);
+
+	res.status(200).json(response({ data }));
+});
+
+module.exports = {
+	updateUser,
+	followUser,
+	unFollowUser,
+	searchUsers,
+	getUserProfile,
+};
