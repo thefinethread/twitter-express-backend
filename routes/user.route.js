@@ -11,7 +11,7 @@ const router = require('express').Router();
 
 router.put('/', protectRoute, updateUser);
 router.get('/search', protectRoute, searchUsers);
-router.get('/profile', protectRoute, getUserProfile);
+router.get('/profile/:username', protectRoute, getUserProfile);
 
 router.post('/follow', protectRoute, followUser);
 router.delete('/unfollow', protectRoute, unFollowUser);

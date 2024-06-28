@@ -111,10 +111,15 @@ const searchUsers = asyncHandler(async (req, res) => {
 });
 
 const getUserProfile = asyncHandler(async (req, res) => {
-	const userId = req.user.id;
+	const { username } = req.params;
+
+	if (!username) {
+		res.status(400);
+		throw new Error('Missing username param');
+	}
 
 	const data = await User.query()
-		.findById(userId)
+		.findOne({ username })
 		.select(
 			'user.id',
 			'user.name',

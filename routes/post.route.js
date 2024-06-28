@@ -1,6 +1,7 @@
 const {
 	createPost,
 	getPostsOfFollowingUsers,
+	getPostsByUsername,
 } = require('../controllers/post.controller');
 const { protectRoute } = require('../middlewares/auth.middleware');
 
@@ -10,5 +11,7 @@ router
 	.route('/')
 	.post(protectRoute, createPost)
 	.get(protectRoute, getPostsOfFollowingUsers);
+
+router.get('/list', protectRoute, getPostsByUsername);
 
 module.exports = router;

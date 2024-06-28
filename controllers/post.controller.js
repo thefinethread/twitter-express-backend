@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const Post = require('../models/Post.model');
 const Follow = require('../models/Follow.model');
 const response = require('../utils/response');
+const User = require('../models/User.model');
 
 const createPost = asyncHandler(async (req, res) => {
 	const { content } = req.body;
@@ -44,4 +45,21 @@ const getPostsOfFollowingUsers = asyncHandler(async (req, res) => {
 	res.status(200).json(response({ data }));
 });
 
-module.exports = { createPost, getPostsOfFollowingUsers };
+const getPostsByUsername = asyncHandler(async (req, res) => {
+	const { username } = req.query;
+
+	if (!username) {
+		res.status(400);
+		throw new Error('Missing username param');
+	}
+
+	const data = await Post.query()
+		.join('user', 'post.user_id', 'user.id')
+		.where('user.username', username)
+		.select(['post.id', 'post.content', 'post.created_at'])
+		.orderBy('created_at', 'DESC');
+
+	res.status(200).json(response({ data }));
+});
+
+module.exports = { createPost, getPostsOfFollowingUsers, getPostsByUsername };
