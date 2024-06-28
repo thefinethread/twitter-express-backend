@@ -25,7 +25,7 @@ class User extends Model {
 				modelClass: Follow,
 				join: {
 					from: 'user.id',
-					to: 'follow.following_id',
+					to: 'follow.followingId',
 				},
 			},
 
@@ -34,7 +34,7 @@ class User extends Model {
 				modelClass: Follow,
 				join: {
 					from: 'user.id',
-					to: 'follow.follower_id',
+					to: 'follow.followerId',
 				},
 			},
 		};

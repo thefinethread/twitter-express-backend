@@ -133,10 +133,38 @@ const getUserProfile = asyncHandler(async (req, res) => {
 	res.status(200).json(response({ data }));
 });
 
+const getFollowers = asyncHandler(async (req, res) => {
+	const { username } = req.params;
+
+	const user = await User.query().findOne({ username });
+
+	const data = await Follow.query()
+		.select('follower.id', 'follower.name', 'follower.username')
+		.joinRelated('follower')
+		.where('follow.following_id', user.id);
+
+	res.status(200).json(response({ data }));
+});
+
+const getFollowing = asyncHandler(async (req, res) => {
+	const { username } = req.params;
+
+	const user = await User.query().findOne({ username });
+
+	const data = await Follow.query()
+		.select('following.id', 'following.name', 'following.username')
+		.joinRelated('following')
+		.where('follow.follower_id', user.id);
+
+	res.status(200).json(response({ data }));
+});
+
 module.exports = {
 	updateUser,
 	followUser,
 	unFollowUser,
 	searchUsers,
 	getUserProfile,
+	getFollowers,
+	getFollowing,
 };

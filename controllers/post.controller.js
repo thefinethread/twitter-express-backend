@@ -56,7 +56,16 @@ const getPostsByUsername = asyncHandler(async (req, res) => {
 	const data = await Post.query()
 		.join('user', 'post.user_id', 'user.id')
 		.where('user.username', username)
-		.select(['post.id', 'post.content', 'post.created_at'])
+		.select([
+			'post.id',
+			'post.content',
+			'post.created_at',
+			Follow.raw(`json_build_object(
+			'id', "user".id,
+			'name', "user".name,
+			'username', "user".username
+		) as user`),
+		])
 		.orderBy('created_at', 'DESC');
 
 	res.status(200).json(response({ data }));
