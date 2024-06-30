@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const User = require('../models/User.model');
 const response = require('../utils/response');
 const Follow = require('../models/Follow.model');
+const { raw } = require('objection');
 
 const updateUser = asyncHandler(async (req, res) => {
 	const { name } = req.body;
@@ -90,22 +91,22 @@ const searchUsers = asyncHandler(async (req, res) => {
 	}
 
 	const users = await User.query()
+		.select([
+			'user.id',
+			'user.name',
+			'user.username',
+			raw(
+				`EXISTS (SELECT 1 FROM follow WHERE follow.following_id = "user".id AND
+				follow.follower_id = ? ) AS "isFollowing"`,
+				[currentUserId]
+			),
+		])
 		.where((builder) => {
 			builder
 				.where('name', 'ilike', `%${searchTerm}%`)
 				.orWhere('username', 'ilike', `%${searchTerm}%`);
 		})
-		.andWhere('id', '!=', currentUserId)
-
-		.leftJoin('follow', 'user.id', 'follow.following_id')
-		.select([
-			'user.id',
-			'user.name',
-			'user.username',
-			User.raw(
-				'CASE WHEN "follow"."follower_id" IS NOT NULL THEN true ELSE false END AS "isFollowing"'
-			),
-		]);
+		.andWhere('id', '!=', currentUserId);
 
 	res.status(200).json(response({ data: users }));
 });
@@ -125,9 +126,15 @@ const getUserProfile = asyncHandler(async (req, res) => {
 			'user.name',
 			'user.username',
 			'user.created_at',
-			User.relatedQuery('posts').count().as('postsCount'),
-			User.relatedQuery('following').count().as('followingCount'),
-			User.relatedQuery('followers').count().as('followersCount')
+			raw(
+				'(SELECT COUNT(*) FROM post WHERE post.user_id = "user".id)::integer'
+			).as('postsCount'),
+			raw(
+				'(SELECT COUNT(*) FROM follow WHERE follow.follower_id = "user".id)::integer'
+			).as('followingCount'),
+			raw(
+				'(SELECT COUNT(*) FROM follow WHERE follow.following_id = "user".id)::integer'
+			).as('followersCount')
 		);
 
 	res.status(200).json(response({ data }));
