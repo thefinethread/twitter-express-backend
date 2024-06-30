@@ -139,7 +139,17 @@ const getFollowers = asyncHandler(async (req, res) => {
 	const user = await User.query().findOne({ username });
 
 	const data = await Follow.query()
-		.select('follower.id', 'follower.name', 'follower.username')
+		.select(
+			'follower.id',
+			'follower.name',
+			'follower.username',
+			Follow.knex().raw(
+				`EXISTS(
+				SELECT 1 FROM follow as f WHERE f.following_id = follower.id AND f.follower_id = ?)
+				AS "isFollowing"`,
+				[user.id]
+			)
+		)
 		.joinRelated('follower')
 		.where('follow.following_id', user.id);
 
@@ -152,7 +162,12 @@ const getFollowing = asyncHandler(async (req, res) => {
 	const user = await User.query().findOne({ username });
 
 	const data = await Follow.query()
-		.select('following.id', 'following.name', 'following.username')
+		.select(
+			'following.id',
+			'following.name',
+			'following.username',
+			Follow.knex().raw('true AS "isFollowing"')
+		)
 		.joinRelated('following')
 		.where('follow.follower_id', user.id);
 
