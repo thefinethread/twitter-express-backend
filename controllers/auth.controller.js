@@ -65,7 +65,8 @@ const getMe = asyncHandler(async (req, res) => {
 });
 
 const logout = (req, res) => {
-	res.clearCookie('token');
+	res.clearCookie('auth-token');
+	res.clearCookie('auth-user');
 	res.status(201).json(response({ message: 'You are logged out' }));
 };
 

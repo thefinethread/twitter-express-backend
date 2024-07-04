@@ -28,6 +28,11 @@ const followUser = asyncHandler(async (req, res) => {
 		throw new Error('Missing query param: followingId');
 	}
 
+	if (followingId === followerId) {
+		res.status(400);
+		throw new Error(`You can't follow yourself`);
+	}
+
 	// check if the user to be followed exists
 	const followingUser = await User.query().findById(followingId);
 
@@ -142,6 +147,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
 
 const getFollowers = asyncHandler(async (req, res) => {
 	const { username } = req.params;
+	const currentUserId = req.user.id;
 
 	const user = await User.query().findOne({ username });
 
@@ -150,11 +156,11 @@ const getFollowers = asyncHandler(async (req, res) => {
 			'follower.id',
 			'follower.name',
 			'follower.username',
-			Follow.knex().raw(
+			raw(
 				`EXISTS(
 				SELECT 1 FROM follow as f WHERE f.following_id = follower.id AND f.follower_id = ?)
 				AS "isFollowing"`,
-				[user.id]
+				[currentUserId]
 			)
 		)
 		.joinRelated('follower')
@@ -165,6 +171,7 @@ const getFollowers = asyncHandler(async (req, res) => {
 
 const getFollowing = asyncHandler(async (req, res) => {
 	const { username } = req.params;
+	const currentUserId = req.user.id;
 
 	const user = await User.query().findOne({ username });
 
@@ -173,7 +180,12 @@ const getFollowing = asyncHandler(async (req, res) => {
 			'following.id',
 			'following.name',
 			'following.username',
-			Follow.knex().raw('true AS "isFollowing"')
+			raw(
+				`EXISTS
+				(SELECT 1 FROM follow f WHERE f.following_id = following.id AND f.follower_id = ?)
+				AS "isFollowing"`,
+				[currentUserId]
+			)
 		)
 		.joinRelated('following')
 		.where('follow.follower_id', user.id);

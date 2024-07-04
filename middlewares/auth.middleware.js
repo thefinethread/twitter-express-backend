@@ -5,9 +5,9 @@ const User = require('../models/User.model');
 const protectRoute = asyncHandler(async (req, res, next) => {
 	let token;
 
-	if (req.cookies.token) {
+	if (req.cookies['auth-token']) {
 		try {
-			token = req.cookies.token;
+			token = req.cookies['auth-token'];
 
 			const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
